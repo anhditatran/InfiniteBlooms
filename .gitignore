@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+.venv/
+.ipynb_checkpoints/
+
+# Keep customer and sales information out of a public repository.
+Marketing_Report_Nov_11_2020_to_Nov_11_2026_INFINITE_BLOOMS.csv
+Sales_Report_Nov_08_2020_to_Nov_15_2026_INFINITE_BLOOMS.csv

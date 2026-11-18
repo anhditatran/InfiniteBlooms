@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Infinite Blooms | Facebook Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Analytics Portfolio</p>
+        <h1>Infinite Blooms</h1>
+        <p class="subtitle">Facebook page performance, audience insights, and data preparation.</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="metrics" aria-label="Key metrics">
+        <article><strong id="total-views">--</strong><span>Total views</span></article>
+        <article><strong id="total-viewers">--</strong><span>Total viewers</span></article>
+        <article><strong id="total-follows">--</strong><span>Net follows</span></article>
+        <article><strong id="total-posts">--</strong><span>Posts published</span></article>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h2>Page performance</h2>
+          </div>
+        </div>
+        <img class="chart" src="facebook_eda.png" alt="Facebook page performance charts">
+      </section>
+
+      <section class="section">
+        <p class="eyebrow">Explore</p>
+        <h2>Project resources</h2>
+        <div class="cards">
+          <a class="card" href="code/eda-facebook.ipynb">
+            <h3>Exploratory analysis</h3>
+            <p>Notebook used to explore views, followers, content, and audience performance.</p>
+            <span>Open notebook &rarr;</span>
+          </a>
+          <a class="card" href="code/cleandata.ipynb">
+            <h3>Data preparation</h3>
+            <p>Notebook used to clean and combine the Facebook exports.</p>
+            <span>Open notebook &rarr;</span>
+          </a>
+          <a class="card" href="clean/daily_performance.csv" download>
+            <h3>Daily performance</h3>
+            <p>Cleaned daily views, viewers, visits, follows, interactions, and click data.</p>
+            <span>Download CSV &rarr;</span>
+          </a>
+          <a class="card" href="clean/post_performance.csv" download>
+            <h3>Post performance</h3>
+            <p>Cleaned post-level engagement, views, reach, and publishing details.</p>
+            <span>Download CSV &rarr;</span>
+          </a>
+          <a class="card" href="clean/audience_profile.csv" download>
+            <h3>Audience profile</h3>
+            <p>Age-and-gender audience percentages derived from Facebook Insights.</p>
+            <span>Download CSV &rarr;</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Built with Python, Pandas, Matplotlib, and Jupyter Notebook.</p>
+    </footer>
+
+    <script>
+      const number = new Intl.NumberFormat();
+      async function loadMetric(name, url, column, useLastValue = false) {
+        const response = await fetch(url);
+        const text = await response.text();
+        const lines = text.trim().split(/\r?\n/);
+        const headers = lines.shift().replace(/^\uFEFF/, "").split(",");
+        const index = headers.indexOf(column);
+        const values = lines.map(line => Number(line.split(",")[index])).filter(Number.isFinite);
+        if (useLastValue) {
+          document.getElementById(name).textContent = number.format(values.at(-1) || 0);
+          return;
+        }
+        const total = lines.reduce((sum, line) => {
+          const value = Number(line.split(",")[index]);
+          return sum + (Number.isFinite(value) ? value : 0);
+        }, 0);
+        document.getElementById(name).textContent = number.format(total);
+      }
+
+      loadMetric("total-views", "clean/daily_performance.csv", "views");
+      loadMetric("total-viewers", "clean/daily_performance.csv", "viewers");
+      loadMetric("total-follows", "clean/daily_performance.csv", "cumulative_follows", true);
+      loadMetric("total-posts", "clean/daily_performance.csv", "posts_published");
+    </script>
+  </body>
+</html>
